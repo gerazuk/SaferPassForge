@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaferPassForge — Gerador Seguro de Senhas & Auditoria de Entropia</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+  <!-- Top Navbar -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            SaferPassForge
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">MVP</span>
+          </span>
+          <p class="text-xs text-slate-400 hidden sm:block">Gerador Criptograficamente Seguro & Auditoria de Entropia</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <a href="/docs" target="_blank" class="text-xs text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-1 font-mono-code">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Swagger API
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+      <!-- Left Column: Generator Box -->
+      <section class="lg:col-span-5 space-y-6">
+        
+        <!-- Output Display Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+          <div class="absolute -right-12 -top-12 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">Senha Gerada</span>
+            <span id="strengthBadge" class="text-xs px-2.5 py-1 rounded-full font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              Aguardando...
+            </span>
+          </div>
+
+          <div class="relative flex items-center bg-slate-950 border border-slate-800 rounded-xl p-3 focus-within:border-emerald-500 transition-all">
+            <input 
+              id="passwordDisplay" 
+              type="text" 
+              readonly 
+              value="Clique em Gerar" 
+              class="w-full bg-transparent font-mono-code text-lg sm:text-xl font-bold tracking-wider text-emerald-300 focus:outline-none select-all"
+            />
+            <button 
+              id="copyBtn" 
+              title="Copiar para área de transferência" 
+              class="ml-2 p-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all active:scale-95 flex items-center justify-center"
+            >
+              <svg id="copyIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              <span id="copiedTooltip" class="hidden text-xs font-semibold text-emerald-400 ml-1">Copiado!</span>
+            </button>
+          </div>
+
+          <!-- Entropy Metagauge -->
+          <div class="mt-4 pt-4 border-t border-slate-800/80 space-y-2">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400">Entropia de Shannon-Hartley:</span>
+              <span id="entropyBits" class="font-mono-code font-bold text-slate-200">0.00 bits</span>
+            </div>
+            <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+              <div id="entropyBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300">Parâmetros de Geração</h2>
+
+          <!-- Length Slider -->
+          <div class="space-y-2">
+            <div class="flex justify-between text-sm">
+              <label for="lengthSlider" class="text-slate-300 font-medium">Comprimento da Senha</label>
+              <span id="lengthValue" class="font-mono-code text-emerald-400 font-bold bg-slate-800 px-2 py-0.5 rounded text-xs">16</span>
+            </div>
+            <input 
+              id="lengthSlider" 
+              type="range" 
+              min="8" 
+              max="64" 
+              value="16" 
+              class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+            />
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono-code">
+              <span>8 min</span>
+              <span>16 padrão</span>
+              <span>32 forte</span>
+              <span>64 max</span>
+            </div>
+          </div>
+
+          <!-- Charsets Checkboxes -->
+          <div class="space-y-3 pt-2 border-t border-slate-800">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input id="chkUpper" type="checkbox" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900">
+              <span class="text-sm text-slate-300 group-hover:text-white transition">Letras Maiúsculas <span class="text-xs text-slate-500 font-mono-code">(A-Z)</span></span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input id="chkLower" type="checkbox" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900">
+              <span class="text-sm text-slate-300 group-hover:text-white transition">Letras Minúsculas <span class="text-xs text-slate-500 font-mono-code">(a-z)</span></span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input id="chkDigits" type="checkbox" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900">
+              <span class="text-sm text-slate-300 group-hover:text-white transition">Dígitos Numéricos <span class="text-xs text-slate-500 font-mono-code">(0-9)</span></span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer group">
+              <input id="chkSymbols" type="checkbox" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900">
+              <span class="text-sm text-slate-300 group-hover:text-white transition">Caracteres Especiais <span class="text-xs text-slate-500 font-mono-code">(!@#$...)</span></span>
+            </label>
+            <label class="flex items-center space-x-3 cursor-pointer group pt-1 border-t border-slate-800/60">
+              <input id="chkExcludeAmbiguous" type="checkbox" class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900">
+              <span class="text-sm text-slate-300 group-hover:text-white transition">Excluir Ambíguos <span class="text-xs text-amber-400/80 font-mono-code">(l, 1, I, O, 0)</span></span>
+            </label>
+          </div>
+
+          <!-- Context Label Input -->
+          <div class="space-y-1.5 pt-2 border-t border-slate-800">
+            <label for="contextInput" class="text-xs font-medium text-slate-300">Rótulo de Contexto / Serviço (Opcional)</label>
+            <input 
+              id="contextInput" 
+              type="text" 
+              maxlength="50" 
+              placeholder="Ex: GitHub, AWS, E-mail Pessoal" 
+              class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            id="generateBtn" 
+            class="w-full py-3 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all flex items-center justify-center space-x-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>Gerar Senha Criptograficamente Segura</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Column: Audit Log History -->
+      <section class="lg:col-span-7 space-y-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                Histórico de Auditoria Persistido
+                <span id="historyCountBadge" class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-mono-code font-normal">0</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Senhas nunca são salvas em texto puro; apenas hashes salgados e máscaras.</p>
+            </div>
+            <button 
+              id="clearHistoryBtn" 
+              class="text-xs px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-colors flex items-center gap-1.5 self-end sm:self-auto"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Limpar Histórico
+            </button>
+          </div>
+
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-[11px] uppercase tracking-wider text-slate-400 bg-slate-950/60 border-b border-slate-800">
+                <tr>
+                  <th class="py-2.5 px-3">Data (UTC)</th>
+                  <th class="py-2.5 px-3">Contexto</th>
+                  <th class="py-2.5 px-3">Tamanho</th>
+                  <th class="py-2.5 px-3">Entropia</th>
+                  <th class="py-2.5 px-3">Classificação</th>
+                  <th class="py-2.5 px-3">Máscara</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody" class="divide-y divide-slate-800/60 font-mono-code text-xs">
+                <!-- Dynamically populated rows -->
+                <tr>
+                  <td colspan="6" class="text-center py-8 text-slate-500 font-sans text-xs">
+                    Nenhum registro de auditoria no histórico local.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Academic & Architecture Architecture Badge -->
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 text-xs text-slate-400 space-y-2">
+          <div class="font-semibold text-slate-300 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            Garantias de Segurança por Design (Security-by-Design):
+          </div>
+          <ul class="list-disc list-inside space-y-1 text-slate-400">
+            <li>Geração utilizando exclusivamente CSPRNG (<code class="text-emerald-400">secrets</code> do Python).</li>
+            <li>Persistência no SQLite com hash salgado HMAC-SHA256 usando chave secreta da aplicação.</li>
+            <li>Cálculo matemático de Entropia real de Shannon-Hartley: \(E = L \times \log_2(R)\).</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-4 text-center text-xs text-slate-500">
+    <p>SaferPassForge &bull; Especialização em Engenharia de Software &bull; 2026</p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+
