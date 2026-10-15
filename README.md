@@ -272,7 +272,18 @@ pytest tests/test_generator.py
 
 ---
 
-## 🤖 8. Governança com Agentes de IA (`AGENTS.md`)
+## 🧠 8. Inteligências Artificiais Utilizadas
+
+O desenvolvimento do **SaferPassForge** utilizou um fluxo estruturado de engenharia assistida por IA em diferentes etapas do SDLC:
+
+1. **AI Gemini 4 Argon (Nível de Detalhe: Máximo)**:
+   - Concepção do prompt inicial de alto nível e geração dos prompts de especificação técnica e implementação estruturados rigorosamente no padrão **CO-STAR** (*Context, Objective, Style, Tone, Audience, Response*).
+2. **VS Code + Antigravity com Gemini 3.8 Flash (Nível: Médio)**:
+   - Pair programming e implementação completa do projeto no workspace: modelagem de domínio CSPRNG, camada de infraestrutura e persistência com SQLite (SQLAlchemy 2.0), API RESTful com FastAPI, interface web interativa em Tailwind CSS, suíte de testes automatizados no padrão AAA e documentação técnica.
+
+---
+
+## 🤖 9. Governança com Agentes de IA (`AGENTS.md`)
 
 Este repositório estabelece regras mandatórias para desenvolvimento assistido por inteligência artificial documentadas no [AGENTS.md](AGENTS.md):
 - **Conventional Commits One-Liner**: Commits em inglês, minúsculas, linha única e até 72 caracteres (ex: `feat(core): implement cryptographic password generator`).
@@ -281,7 +292,7 @@ Este repositório estabelece regras mandatórias para desenvolvimento assistido 
 
 ---
 
-## 📄 9. Licença
+## 📄 10. Licença
 
 Este projeto é distribuído sob os termos da licença **MIT**. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
 
