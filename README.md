@@ -281,6 +281,8 @@ O desenvolvimento do **SaferPassForge** utilizou um fluxo estruturado de engenha
 2. **VS Code + Antigravity com Gemini 3.8 Flash (Nível: Médio)**:
    - Pair programming e implementação completa do projeto no workspace: modelagem de domínio CSPRNG, camada de infraestrutura e persistência com SQLite (SQLAlchemy 2.0), API RESTful com FastAPI, interface web interativa em Tailwind CSS, suíte de testes automatizados no padrão AAA e documentação técnica.
 
+> 📋 O histórico detalhado e cronológico de todos os prompts utilizados no projeto está documentado em [PROMPTS_LOG.md](PROMPTS_LOG.md).
+
 ---
 
 ## 🤖 9. Governança com Agentes de IA (`AGENTS.md`)
